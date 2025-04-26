@@ -1,14 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+
 import Description from "./components/Description/Description";
 import Options from "./components/Options/Options";
 
 import "./App.css";
+import Feedback from "./components/Feedback/Feedback";
+import EmptyState from "./components/Notification/EmptyState";
+
 function App() {
-  const [feedback, setFeedback] = useState({
-    good: 0,
-    neutral: 0,
-    bad: 0,
-  });
+  const savedInfo = JSON.parse(localStorage.getItem("feedback"));
+  const initialFeedback = savedInfo || { good: 0, neutral: 0, bad: 0 };
+  const [feedback, setFeedback] = useState(initialFeedback);
 
   const updateFeedback = (feedbackType) => {
     setFeedback((prev) => ({
@@ -16,13 +18,41 @@ function App() {
       [feedbackType]: prev[feedbackType] + 1,
     }));
   };
+  useEffect(() => {
+    localStorage.setItem("feedback", JSON.stringify(feedback));
+  }, [feedback]);
+
+  const totalFeedback = feedback.good + feedback.neutral + feedback.bad;
+  const positiveFeedback = Math.round((feedback.good / totalFeedback) * 100);
+  const resetFeedback = () => {
+    setFeedback({
+      good: 0,
+      neutral: 0,
+      bad: 0,
+    });
+  };
   return (
     <>
       <div>
         <Description />
       </div>
       <div>
-        <Options feedback={feedback} updateFeedback={updateFeedback} />
+        <Options
+          feedback={feedback}
+          updateFeedback={updateFeedback}
+          totalFeedback={totalFeedback}
+          resetFeedback={resetFeedback}
+        />
+      </div>
+      <div>
+        {totalFeedback > 0 ? (
+          <Feedback
+            totalFeedback={totalFeedback}
+            positiveFeedback={positiveFeedback}
+          />
+        ) : (
+          <EmptyState />
+        )}
       </div>
     </>
   );
