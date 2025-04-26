@@ -38,7 +38,6 @@ function App() {
       </div>
       <div>
         <Options
-          feedback={feedback}
           updateFeedback={updateFeedback}
           totalFeedback={totalFeedback}
           resetFeedback={resetFeedback}
@@ -47,6 +46,7 @@ function App() {
       <div>
         {totalFeedback > 0 ? (
           <Feedback
+            feedback={feedback}
             totalFeedback={totalFeedback}
             positiveFeedback={positiveFeedback}
           />
